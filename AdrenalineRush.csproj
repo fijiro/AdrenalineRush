@@ -61,18 +61,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Patch.cs" />
+    <Compile Include="AdrenalineRush.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Config.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Dependencies\Aki.Reflection.dll" />
-    <Content Include="Dependencies\Assembly-CSharp.dll" />
-    <Content Include="Dependencies\BepInEx.dll" />
-    <Content Include="Dependencies\UnityEngine.CoreModule.dll" />
-    <Content Include="Dependencies\UnityEngine.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
