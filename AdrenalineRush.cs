@@ -35,7 +35,7 @@ namespace Adrenaline
 				try
 				{
 					//checks cooldown and all effects on head for painkiller effect. if there are, dont give adrenaline
-					if (Time.time < cooldown) // || __instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller" || eff.Key == "TunnelVision")
+					if (Time.time < cooldown || __instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller"))
 					{
 						return;
 					}
@@ -46,13 +46,13 @@ namespace Adrenaline
 						//here the actual painkiller effect is created
 						//{BodyPart, start time, duration, fade out duration, strength?, ??}
 						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("PainKiller", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, 0f, duration, 2f, 1f, null });
-						//Add Tunnelvision after painkiller
+						//Add TunnelVision after PainKiller
 						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2f, 5f, 1f, null });
 					}
 				}
 				catch (Exception)
 				{
-					Logger.LogWarning("AdrenalineRush Exception");
+					Logger.LogError("AdrenalineRush Exception!");
 				}
 			}
 		}
