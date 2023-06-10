@@ -3,7 +3,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Aki.Reflection.Patching;
-using Adrenaline.Configs;
+using static Adrenaline.Configs.AdrenalineConfig;
+using UnityEngine;
 
 namespace Adrenaline
 {
@@ -19,28 +20,40 @@ namespace Adrenaline
 		//or this
 		protected override MethodBase GetTargetMethod() => typeof(Player).GetMethod("ReceiveDamage", BindingFlags.Instance | BindingFlags.NonPublic);
 
+		static float cooldown = 0f;
+
 		[PatchPostfix]
+
 		static void Postfix(ref Player __instance, EDamageType type)
 		{
-			if (AdrenalineConfig.EnableMod.Value == false) return;
+			if (EnableMod.Value == false) return;
+
+			float duration = AdrenalineDuration.Value;
 
 			if (type == EDamageType.Bullet || type == EDamageType.Explosion || type == EDamageType.Sniper || type == EDamageType.Landmine || type == EDamageType.GrenadeFragment)
 			{
 				try
 				{
-					//checks all effects on head for painkiller effect. if there are, dont give adrenaline
-					if (__instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller"))
+					//checks cooldown and all effects on head for painkiller effect. if there are, dont give adrenaline
+					if (Time.time < cooldown || __instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller"))
 					{
 						return;
 					}
-
-					//here the actual painkiller effect is created. Cooldown when?
-					int duration = AdrenalineConfig.AdrenalineDuration.Value;
-					
-					effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("PainKiller", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, 0f, duration, 5f, 1f, null });
-
+					else
+					{
+						// next possible adrenalinerush = painkiller + tunnelvision + cooldown duration
+						cooldown = Time.time + 1.5f * duration + AdrenalineCooldown.Value;
+						//here the actual painkiller effect is created
+						//{BodyPart, start time, duration, fade out duration, strength?, ??}
+						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("PainKiller", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, 0f, duration, 2f, 1f, null });
+						//Add TunnelVision after PainKiller
+						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2f, 5f, 1f, null });
+					}
 				}
-				catch (Exception) { }
+				catch (Exception)
+				{
+					Logger.LogError("AdrenalineRush Exception!");
+				}
 			}
 		}
 	}
