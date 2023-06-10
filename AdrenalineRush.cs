@@ -10,6 +10,7 @@ namespace Adrenaline
 {
 	public class AdrenalinePatch : ModulePatch
 	{
+		static float cooldown;
 		//i have no clue what this does :D
 		static MethodInfo effectMethod = typeof(ActiveHealthControllerClass).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(m =>
 			m.GetParameters().Length == 6
@@ -21,11 +22,15 @@ namespace Adrenaline
 		protected override MethodBase GetTargetMethod() => typeof(Player).GetMethod("ReceiveDamage", BindingFlags.Instance | BindingFlags.NonPublic);
 
 		[PatchPostfix]
+
 		static void Postfix(ref Player __instance, EDamageType type)
 		{
 			if (EnableMod.Value == false) return;
+
 			float duration = AdrenalineDuration.Value;
-			float cooldown = 0f;
+			// next possible adrenalinerush = painkiller + tunnelvision + cooldown duration
+			cooldown = Time.time + 1.5f * duration + AdrenalineCooldown.Value;
+
 			if (type == EDamageType.Bullet || type == EDamageType.Explosion || type == EDamageType.Sniper || type == EDamageType.Landmine || type == EDamageType.GrenadeFragment)
 			{
 				try
@@ -34,14 +39,10 @@ namespace Adrenaline
 					if (Time.time > cooldown && !__instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller"))
 					{
 						//here the actual painkiller effect is created. Cooldown when?
-						duration = AdrenalineDuration.Value;
-						// next possible adrenalinerush = painkiller + tunnelvision + cooldown duration
-						cooldown = Time.time + 1.5f * duration + AdrenalineCooldown.Value;
-
 						//{BodyPart, start time, duration, fade out duration, ??, ??}
 						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("PainKiller", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, 0f, duration, 2f, 1f, null });
 						//Add Tunnelvision after painkiller
-						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2, 5f, 1f, null });
+						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, 5 + duration / 2f, 5f, 100f, null });
 					}
 				}
 				catch (Exception)
