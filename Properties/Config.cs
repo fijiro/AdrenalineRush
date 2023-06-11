@@ -10,20 +10,20 @@ namespace Adrenaline.Configs
 
 		public static void Init(ConfigFile Config)
         {
-            string debugmode = "General Settings";
+            string configSettings = "General Settings";
 
-            EnableMod = Config.Bind(debugmode, "Enable Mod", true,
+            EnableMod = Config.Bind(configSettings, "Enable Mod", true,
                 new ConfigDescription("Enable or disable the mod",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 100 }));
 
-            AdrenalineDuration = Config.Bind(debugmode, "Adrenaline Duration", 20f,
+            AdrenalineDuration = Config.Bind(configSettings, "Adrenaline Duration", 20f,
                 new ConfigDescription("Tunnelvision duration is half of this value",
                 new AcceptableValueRange<float>(0f, 120f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 50 }));
 
-			AdrenalineCooldown = Config.Bind(debugmode, "Adrenaline Cooldown", 60f,
-				new ConfigDescription("Cooldown starts after the tunnelvision effect wears off",
+			AdrenalineCooldown = Config.Bind(configSettings, "Adrenaline Cooldown", 60f,
+				new ConfigDescription("Cooldown starts after the painkiller effect wears off",
 				new AcceptableValueRange<float>(0f, 120f),
 				new ConfigurationManagerAttributes { IsAdvanced = false, Order = 00 }));
 		}
@@ -32,5 +32,9 @@ namespace Adrenaline.Configs
         {
             return AdrenalineCooldown.Value;
         }
-    }
+		public static float getDuration()
+		{
+			return AdrenalineDuration.Value;
+		}
+	}
 }

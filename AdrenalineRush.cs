@@ -22,38 +22,34 @@ namespace Adrenaline
 		protected override MethodBase GetTargetMethod() => typeof(Player).GetMethod("ReceiveDamage", BindingFlags.Instance | BindingFlags.NonPublic);
 
 		static float cooldown = 0f;
-
+		static float duration = 100f;
 		[PatchPostfix]
 
 		static void Postfix(ref Player __instance, EDamageType type)
 		{
 			if (EnableMod.Value == false) return;
 
-			float duration = AdrenalineDuration.Value;
-
 			if (type == EDamageType.Bullet || type == EDamageType.Explosion || type == EDamageType.Sniper || type == EDamageType.Landmine || type == EDamageType.GrenadeFragment || type == EDamageType.Blunt)
 			{
-				Logger.LogInfo("Took Damage at " + Time.time);
-				
-					//checks cooldown and all effects on head for painkiller effect. if there are, dont give adrenaline
-					if (Time.time < cooldown || __instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller" || eff.Key == "TunnelVision"))
-					{
-						return;
-					}
-					else 
-					{
-						// next possible adrenalinerush = painkiller + tunnelvision + cooldown duration
-						Logger.LogInfo(Time.time + "Time when cooldown Before: " + cooldown);
-						cooldown = Time.time + getCooldown();
-						Logger.LogInfo("Cooldown After: " + cooldown);
-						//here the actual painkiller effect is created
-						//EBodyPart bodyPart, float? delayTime = null, float? workTime = null, float? residueTime = null, float? strength = null, Action<T> initCallback = null
-						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("PainKiller", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, 0f, duration, 2f, 1f, null });
-						//Add TunnelVision after PainKiller
-						effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2f, 5f, 1f, null });
-					}
+				//checks cooldown and all effects on head for painkiller effect. if there are, dont give adrenaline
+				if (Time.time < cooldown || __instance.ActiveHealthController.BodyPartEffects.Effects[EBodyPart.Head].Any(eff => eff.Key == "PainKiller" || eff.Key == "TunnelVision"))
+				{
+					return;
+				}
+				else
+				{
+					// next possible adrenalinerush = painkiller + tunnelvision + cooldown duration
+
+					duration = getDuration();
+					cooldown = Time.time + getCooldown() + duration;
+					//here the actual painkiller effect is created
+					//EBodyPart bodyPart, float? delayTime = null, float? workTime = null, float? residueTime = null, float? strength = null, Action<T> initCallback = null
+					effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("PainKiller", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, 0f, duration, 2f, 1f, null });
+					//Add TunnelVision after PainKiller
+					effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2f, 5f, 1f, null });
 				}
 			}
 		}
 	}
+}
 }
