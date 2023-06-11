@@ -17,15 +17,20 @@ namespace Adrenaline.Configs
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 100 }));
 
-            AdrenalineDuration = Config.Bind(debugmode, "Adrenaline Duration", 10f,
+            AdrenalineDuration = Config.Bind(debugmode, "Adrenaline Duration", 20f,
                 new ConfigDescription("Tunnelvision duration is half of this value",
                 new AcceptableValueRange<float>(0f, 120f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 50 }));
 
-			AdrenalineCooldown = Config.Bind(debugmode, "Adrenaline Cooldown", 120f,
+			AdrenalineCooldown = Config.Bind(debugmode, "Adrenaline Cooldown", 60f,
 				new ConfigDescription("Cooldown starts after the tunnelvision effect wears off",
-				new AcceptableValueRange<float>(60f, 300f),
+				new AcceptableValueRange<float>(0f, 120f),
 				new ConfigurationManagerAttributes { IsAdvanced = false, Order = 00 }));
 		}
+
+        public static float getCooldown()
+        {
+            return AdrenalineCooldown.Value;
+        }
     }
 }

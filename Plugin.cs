@@ -11,6 +11,7 @@ namespace Adrenaline
         {
             AdrenalineConfig.Init(Config);
             new AdrenalinePatch().Enable();
+
         }
     }
 }
