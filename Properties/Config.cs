@@ -5,8 +5,10 @@ namespace Adrenaline.Configs
     internal class AdrenalineConfig
     {
         public static ConfigEntry<bool> EnableMod { get; private set; }
-        public static ConfigEntry<float> AdrenalineDuration { get; private set; }
-		public static ConfigEntry<float> AdrenalineCooldown { get; private set; }
+		public static ConfigEntry<bool> EnableLog { get; private set; }
+		public static ConfigEntry<int> AdrenalineDuration { get; private set; }
+		public static ConfigEntry<int> AdrenalineCooldown { get; private set; }
+		public static ConfigEntry<bool> DisableDrawbacks { get; private set; }
 
 		public static void Init(ConfigFile Config)
         {
@@ -17,24 +19,25 @@ namespace Adrenaline.Configs
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 100 }));
 
-            AdrenalineDuration = Config.Bind(configSettings, "Adrenaline Duration", 20f,
+			EnableLog = Config.Bind(configSettings, "Enable Log", false,
+				new ConfigDescription("Enable or disable logging",
+				null,
+				new ConfigurationManagerAttributes { IsAdvanced = true, Order = 75 }));
+
+			AdrenalineDuration = Config.Bind(configSettings, "Adrenaline Duration", 20,
                 new ConfigDescription("Tunnelvision duration is half of this value",
-                new AcceptableValueRange<float>(0f, 120f),
+                new AcceptableValueRange<int>(0, 120),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 50 }));
 
-			AdrenalineCooldown = Config.Bind(configSettings, "Adrenaline Cooldown", 60f,
+			AdrenalineCooldown = Config.Bind(configSettings, "Adrenaline Cooldown", 60,
 				new ConfigDescription("Cooldown starts after the painkiller effect wears off",
-				new AcceptableValueRange<float>(0f, 120f),
+				new AcceptableValueRange<int>(0, 120),
 				new ConfigurationManagerAttributes { IsAdvanced = false, Order = 00 }));
-		}
 
-        public static float getCooldown()
-        {
-            return AdrenalineCooldown.Value;
-        }
-		public static float getDuration()
-		{
-			return AdrenalineDuration.Value;
+			DisableDrawbacks = Config.Bind(configSettings, "Disable Drawbacks", false,
+				new ConfigDescription("Disable negative effects caused by adrenaline rush",
+				null,
+				new ConfigurationManagerAttributes { IsAdvanced = false, Order = -50 }));
 		}
 	}
 }
