@@ -81,8 +81,6 @@ namespace Adrenaline
 						if (!AdrenalineConfig.DisableDrawbacks.Value)
 						{
 							effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("TunnelVision", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2f, 2f, 1f, null });
-						}
-						{
 							effectMethod.MakeGenericMethod(typeof(ActiveHealthControllerClass).GetNestedType("Pain", BindingFlags.Instance | BindingFlags.NonPublic)).Invoke(__instance.ActiveHealthController, new object[] { EBodyPart.Head, duration, duration / 2f, 2f, 1f, null });
 						}
 					}
