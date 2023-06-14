@@ -30,13 +30,16 @@ namespace Adrenaline
 
 		static void Postfix(ref Player __instance, EDamageType type)
 		{
-			if (AdrenalineConfig.EnableMod.Value == false || !__instance.IsYourPlayer)
+			if (!AdrenalineConfig.EnableMod.Value || !__instance.IsYourPlayer)
 			{
-
-				Logger.LogInfo("--- ADRENALINERUSH ---");
-				Logger.LogInfo("!__instance.IsYourPlayer: " + __instance.IsYourPlayer);
-				Logger.LogInfo("skip rush at " + Time.time + " with cooldown " + cooldown);
-				Logger.LogInfo("----------------------");
+				if (AdrenalineConfig.EnableLog.Value)
+				{
+					Logger.LogInfo("--- ADRENALINERUSH ---");
+					Logger.LogInfo("EnableMod.Value: " + AdrenalineConfig.EnableMod.Value);
+					Logger.LogInfo("__instance.IsYourPlayer: " + __instance.IsYourPlayer);
+					Logger.LogInfo("skip rush at " + Time.time + " with cooldown " + cooldown);
+					Logger.LogInfo("----------------------");
+				}
 
 				return;
 			}
